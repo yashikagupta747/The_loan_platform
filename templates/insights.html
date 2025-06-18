@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+
+{% block title %}Insights - Loan Insights Platform{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="text-center">Loan Data Insights</h1>
+            <p class="text-center text-muted">Key findings from our machine learning analysis</p>
+        </div>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="row mb-5">
+        <div class="col-md-3 mb-3">
+            <div class="card metric-card">
+                <div class="card-body text-center">
+                    <h3 class="text-primary">50,000</h3>
+                    <p class="mb-0">Total Loans Analyzed</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card metric-card">
+                <div class="card-body text-center">
+                    <h3 class="text-success">$15,000</h3>
+                    <p class="mb-0">Average Loan Amount</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card metric-card">
+                <div class="card-body text-center">
+                    <h3 class="text-info">78%</h3>
+                    <p class="mb-0">Approval Rate</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card metric-card">
+                <div class="card-body text-center">
+                    <h3 class="text-warning">12%</h3>
+                    <p class="mb-0">Average Interest Rate</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="row mb-5">
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Top Risk Factors</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="riskFactorsChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Loan Grade Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="gradeDistributionChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Model Performance -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Model Performance Metrics</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 text-center">
+                            <h4 class="text-success">89%</h4>
+                            <p>Model Accuracy</p>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <h4 class="text-info">Random Forest</h4>
+                            <p>Best Performing Model</p>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <h4 class="text-warning">$2,150</h4>
+                            <p>Average Prediction Error</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Business Recommendations -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Business Recommendations</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <i class="fas fa-check text-success me-2"></i>
+                            Focus on loans in grades A-C for lower risk portfolio
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-check text-success me-2"></i>
+                            Monitor borrowers with DTI > 30% more closely
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-check text-success me-2"></i>
+                            Use Random Forest model for loan amount predictions
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-check text-success me-2"></i>
+                            Consider interest rate adjustments based on risk factors
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-check text-success me-2"></i>
+                            Implement automated risk scoring for faster processing
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Static data for demonstration
+const riskFactors = ['Credit Score', 'Income Level', 'DTI Ratio', 'Employment History', 'Loan Amount'];
+const gradeDistribution = {
+    'A': 0.25,
+    'B': 0.30,
+    'C': 0.25,
+    'D': 0.15,
+    'E': 0.05
+};
+
+// Risk Factors Chart
+const riskCtx = document.getElementById('riskFactorsChart').getContext('2d');
+new Chart(riskCtx, {
+    type: 'bar',
+    data: {
+        labels: riskFactors,
+        datasets: [{
+            label: 'Importance Score',
+            data: [0.85, 0.72, 0.68, 0.55, 0.48],
+            backgroundColor: 'rgba(54, 162, 235, 0.8)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 1,
+                ticks: {
+                    callback: function(value) {
+                        return (value * 100) + '%';
+                    }
+                }
+            }
+        },
+        plugins: {
+            legend: {
+                display: false
+            }
+        }
+    }
+});
+
+// Grade Distribution Chart
+const gradeCtx = document.getElementById('gradeDistributionChart').getContext('2d');
+new Chart(gradeCtx, {
+    type: 'doughnut',
+    data: {
+        labels: Object.keys(gradeDistribution),
+        datasets: [{
+            data: Object.values(gradeDistribution),
+            backgroundColor: [
+                '#28a745',
+                '#17a2b8',
+                '#ffc107',
+                '#fd7e14',
+                '#dc3545'
+            ],
+            borderWidth: 2,
+            borderColor: '#fff'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

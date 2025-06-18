@@ -1,0 +1,733 @@
+{% extends "base.html" %}
+
+{% block title %}Employee Dashboard - Loan Insights Platform{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1><i class="fas fa-tachometer-alt me-2"></i>Employee Dashboard</h1>
+                    <p class="text-muted">Loan decision support and analytics</p>
+                </div>
+                <div>
+                    <button class="btn btn-success" onclick="showNewApplicationModal()">
+                        <i class="fas fa-plus me-2"></i>New Application
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card metric-card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 id="pendingCount">0</h4>
+                            <p class="mb-0">Pending Applications</p>
+                        </div>
+                        <i class="fas fa-clock fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card metric-card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 id="approvedCount">0</h4>
+                            <p class="mb-0">Approved Applications</p>
+                        </div>
+                        <i class="fas fa-check-circle fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card metric-card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 id="approvalRate">0%</h4>
+                            <p class="mb-0">Approval Rate</p>
+                        </div>
+                        <i class="fas fa-percentage fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card metric-card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 id="totalDisbursed">$0</h4>
+                            <p class="mb-0">Total Disbursed</p>
+                        </div>
+                        <i class="fas fa-dollar-sign fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Loan Applications Table -->
+        <div class="col-lg-12 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap">
+                        <h5 class="mb-2 mb-md-0"><i class="fas fa-list me-2"></i>Loan Applications</h5>
+                        
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                            <!-- Status Filter Pills -->
+                            <div class="btn-group btn-group-sm" role="group" aria-label="Status filters">
+                                <button type="button" class="btn btn-outline-primary active" onclick="filterByStatus('all')">
+                                    All
+                                </button>
+                                <button type="button" class="btn btn-outline-primary" onclick="filterByStatus('pending')">
+                                    Pending (<span id="pendingTabCount">0</span>)
+                                </button>
+                                <button type="button" class="btn btn-outline-primary" onclick="filterByStatus('approved')">
+                                    Approved (<span id="approvedTabCount">0</span>)
+                                </button>
+                                <button type="button" class="btn btn-outline-primary" onclick="filterByStatus('rejected')">
+                                    Rejected (<span id="rejectedTabCount">0</span>)
+                                </button>
+                            </div>
+                            
+                            <!-- Search Input -->
+                            <input type="text" class="form-control form-control-sm" id="searchInput" placeholder="Search..." style="width: 180px;">
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="applicationsTable">
+                            <thead>
+                                <tr>
+                                    <th>Application ID</th>
+                                    <th>Applicant</th>
+                                    <th>Amount</th>
+                                    <th>Risk Score</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="applicationsTableBody">
+                                <!-- Applications will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    <nav aria-label="Applications pagination">
+                        <ul class="pagination justify-content-center" id="pagination">
+                            <!-- Pagination will be generated here -->
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Review Modal -->
+    <div class="modal fade" id="reviewModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Application Review</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="applicationDetails">
+                    <!-- Application details will be loaded here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" onclick="approveApplication()">
+                        <i class="fas fa-check me-2"></i>Approve
+                    </button>
+                    <button type="button" class="btn btn-danger" onclick="rejectApplication()">
+                        <i class="fas fa-times me-2"></i>Reject
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Application Modal -->
+    <div class="modal fade" id="newApplicationModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">New Loan Application</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="newApplicationForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Applicant Name</label>
+                                <input type="text" class="form-control" id="applicantName" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Annual Income ($)</label>
+                                <input type="number" class="form-control" id="applicantIncome" required min="10000">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Credit Score</label>
+                                <input type="number" class="form-control" id="applicantCredit" min="300" max="850" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Requested Amount ($)</label>
+                                <input type="number" class="form-control" id="requestedAmount" required min="1000">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">DTI Ratio</label>
+                                <input type="number" class="form-control" id="dtiRatio" step="0.01" max="1" required>
+                                <div class="form-text">Enter as decimal (e.g., 0.25 for 25%)</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Employment Length (years)</label>
+                                <select class="form-control" id="empLength" required>
+                                    <option value="">Select...</option>
+                                    <option value="0">Less than 1 year</option>
+                                    <option value="1">1 year</option>
+                                    <option value="2">2 years</option>
+                                    <option value="3">3 years</option>
+                                    <option value="4">4 years</option>
+                                    <option value="5">5+ years</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="submitNewApplication()">
+                        <i class="fas fa-save me-2"></i>Submit Application
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Global variables
+let currentApplications = [];
+let currentPage = 1;
+let itemsPerPage = 10;
+let currentFilter = 'all';
+let currentApplicationId = null;
+
+// Initialize dashboard
+document.addEventListener('DOMContentLoaded', function() {
+    loadApplications();
+    setupSearch();
+});
+
+// Load applications function
+function loadApplications() {
+    const tbody = document.getElementById('applicationsTableBody');
+    tbody.innerHTML = '<tr><td colspan="7" class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading applications...</td></tr>';
+    
+    fetch('/api/applications')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            currentApplications = Array.isArray(data) ? data : [];
+            
+            if (currentApplications.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center text-muted">
+                            <i class="fas fa-info-circle"></i> 
+                            No applications found. 
+                            <button class="btn btn-sm btn-success ms-2" onclick="showNewApplicationModal()">
+                                <i class="fas fa-plus"></i> Add New Application
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            } else {
+                renderApplicationsTable();
+                updatePagination();
+                updateTabCounts();
+            }
+            
+            loadDashboardStats();
+        })
+        .catch(error => {
+            console.error('Error loading applications:', error);
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="text-center text-danger">
+                        <i class="fas fa-exclamation-triangle"></i> 
+                        Error loading applications. Please check your server connection.
+                    </td>
+                </tr>
+            `;
+        });
+}
+
+// Load dashboard statistics
+function loadDashboardStats() {
+    fetch('/api/dashboard_stats')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('pendingCount').textContent = data.pending || 0;
+            document.getElementById('approvedCount').textContent = data.approved || 0;
+            document.getElementById('approvalRate').textContent = (data.approval_rate || 0) + '%';
+            document.getElementById('totalDisbursed').textContent = '$' + (data.total_disbursed || 0).toLocaleString();
+        })
+        .catch(error => {
+            console.error('Error loading dashboard stats:', error);
+        });
+}
+
+// Render applications table
+function renderApplicationsTable() {
+    const tbody = document.getElementById('applicationsTableBody');
+    const filteredApps = filterApplicationsByType(currentApplications, currentFilter);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const pageApps = filteredApps.slice(startIndex, endIndex);
+    
+    tbody.innerHTML = '';
+    
+    if (pageApps.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="7" class="text-center text-muted">
+                    No applications match the current filter
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    pageApps.forEach(app => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td><strong>${app.id}</strong></td>
+            <td>${app.applicant}</td>
+            <td>$${app.amount.toLocaleString()}</td>
+            <td>${getRiskBadge(app.riskScore)}</td>
+            <td>${getStatusBadge(app.status)}</td>
+            <td>${app.date}</td>
+            <td>
+                <button class="btn btn-sm btn-primary" onclick="reviewApplication('${app.id}')">
+                    <i class="fas fa-eye"></i> Review
+                </button>
+                ${app.status === 'Pending' ? `
+                <div class="btn-group" role="group">
+                    <button class="btn btn-sm btn-success" onclick="quickApprove('${app.id}')">
+                        <i class="fas fa-check"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="quickReject('${app.id}')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                ` : ''}
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+// Filter applications by type
+function filterApplicationsByType(applications, filter) {
+    switch (filter) {
+        case 'pending':
+            return applications.filter(app => app.status === 'Pending');
+        case 'approved':
+            return applications.filter(app => app.status === 'Approved');
+        case 'rejected':
+            return applications.filter(app => app.status === 'Rejected');
+        default:
+            return applications;
+    }
+}
+
+// Filter by status tabs
+function filterByStatus(status) {
+    currentFilter = status;
+    currentPage = 1;
+    
+    // Update active tab styling
+    document.querySelectorAll('.btn-group button').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    renderApplicationsTable();
+    updatePagination();
+}
+
+// Setup search functionality
+function setupSearch() {
+    const searchInput = document.getElementById('searchInput');
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        const filteredApps = currentApplications.filter(app => 
+            app.id.toLowerCase().includes(searchTerm) ||
+            app.applicant.toLowerCase().includes(searchTerm)
+        );
+        
+        const tbody = document.getElementById('applicationsTableBody');
+        tbody.innerHTML = '';
+        
+        filteredApps.slice(0, itemsPerPage).forEach(app => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><strong>${app.id}</strong></td>
+                <td>${app.applicant}</td>
+                <td>$${app.amount.toLocaleString()}</td>
+                <td>${getRiskBadge(app.riskScore)}</td>
+                <td>${getStatusBadge(app.status)}</td>
+                <td>${app.date}</td>
+                <td>
+                    <button class="btn btn-sm btn-primary" onclick="reviewApplication('${app.id}')">
+                        <i class="fas fa-eye"></i> Review
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+    });
+}
+
+// Update pagination
+function updatePagination() {
+    const filteredApps = filterApplicationsByType(currentApplications, currentFilter);
+    const totalPages = Math.ceil(filteredApps.length / itemsPerPage);
+    const pagination = document.getElementById('pagination');
+    
+    pagination.innerHTML = '';
+    
+    // Previous button
+    const prevLi = document.createElement('li');
+    prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+    prevLi.innerHTML = `<a class="page-link" href="#" onclick="changePage(${currentPage - 1})">&laquo;</a>`;
+    pagination.appendChild(prevLi);
+    
+    // Page numbers
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    
+    if (endPage - startPage + 1 < maxVisiblePages) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+        const li = document.createElement('li');
+        li.className = `page-item ${i === currentPage ? 'active' : ''}`;
+        li.innerHTML = `<a class="page-link" href="#" onclick="changePage(${i})">${i}</a>`;
+        pagination.appendChild(li);
+    }
+    
+    // Next button
+    const nextLi = document.createElement('li');
+    nextLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+    nextLi.innerHTML = `<a class="page-link" href="#" onclick="changePage(${currentPage + 1})">&raquo;</a>`;
+    pagination.appendChild(nextLi);
+}
+
+// Change page
+function changePage(page) {
+    if (page < 1 || page > Math.ceil(filterApplicationsByType(currentApplications, currentFilter).length / itemsPerPage)) {
+        return;
+    }
+    currentPage = page;
+    renderApplicationsTable();
+    updatePagination();
+}
+
+// Update tab counts
+function updateTabCounts() {
+    document.getElementById('pendingTabCount').textContent = 
+        currentApplications.filter(app => app.status === 'Pending').length;
+    document.getElementById('approvedTabCount').textContent = 
+        currentApplications.filter(app => app.status === 'Approved').length;
+    document.getElementById('rejectedTabCount').textContent = 
+        currentApplications.filter(app => app.status === 'Rejected').length;
+}
+
+// Get risk badge HTML
+function getRiskBadge(riskScore) {
+    if (riskScore >= 0.7) {
+        return `<span class="badge bg-success">Low (${riskScore.toFixed(2)})</span>`;
+    } else if (riskScore >= 0.4) {
+        return `<span class="badge bg-warning">Medium (${riskScore.toFixed(2)})</span>`;
+    } else {
+        return `<span class="badge bg-danger">High (${riskScore.toFixed(2)})</span>`;
+    }
+}
+
+// Get status badge HTML
+function getStatusBadge(status) {
+    const badgeClass = {
+        'Pending': 'bg-warning',
+        'Approved': 'bg-success',
+        'Rejected': 'bg-danger',
+        'Under Review': 'bg-info'
+    };
+    return `<span class="badge ${badgeClass[status] || 'bg-secondary'}">${status}</span>`;
+}
+
+// Show new application modal
+function showNewApplicationModal() {
+    const modal = new bootstrap.Modal(document.getElementById('newApplicationModal'));
+    modal.show();
+}
+
+// Submit new application
+function submitNewApplication() {
+    const form = document.getElementById('newApplicationForm');
+    if (!form.checkValidity()) {
+        form.classList.add('was-validated');
+        return;
+    }
+    
+    const newApp = {
+        applicant: document.getElementById('applicantName').value,
+        income: parseInt(document.getElementById('applicantIncome').value),
+        creditScore: parseInt(document.getElementById('applicantCredit').value),
+        amount: parseInt(document.getElementById('requestedAmount').value),
+        dti: parseFloat(document.getElementById('dtiRatio').value),
+        employment_length: parseInt(document.getElementById('empLength').value)
+    };
+    
+    fetch('/api/applications', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newApp)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Application created successfully!', 'success');
+            document.getElementById('newApplicationModal').querySelector('.btn-close').click();
+            form.reset();
+            form.classList.remove('was-validated');
+            loadApplications(); // Refresh the table
+        } else {
+            showNotification('Error creating application: ' + (data.error || 'Unknown error'), 'danger');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Error creating application', 'danger');
+    });
+}
+
+// Review application
+function reviewApplication(appId) {
+    currentApplicationId = appId;
+    const application = currentApplications.find(app => app.id === appId);
+    
+    if (!application) {
+        showNotification('Application not found', 'danger');
+        return;
+    }
+    
+    const modalBody = document.getElementById('applicationDetails');
+    modalBody.innerHTML = `
+        <div class="row">
+            <div class="col-md-6">
+                <h5>Application Details</h5>
+                <table class="table table-sm">
+                    <tr>
+                        <th>Application ID:</th>
+                        <td>${application.id}</td>
+                    </tr>
+                    <tr>
+                        <th>Applicant:</th>
+                        <td>${application.applicant}</td>
+                    </tr>
+                    <tr>
+                        <th>Requested Amount:</th>
+                        <td>$${application.amount.toLocaleString()}</td>
+                    </tr>
+                    <tr>
+                        <th>Credit Score:</th>
+                        <td>${application.creditScore}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <h5>Financial Information</h5>
+                <table class="table table-sm">
+                    <tr>
+                        <th>Annual Income:</th>
+                        <td>$${application.income.toLocaleString()}</td>
+                    </tr>
+                    <tr>
+                        <th>DTI Ratio:</th>
+                        <td>${application.dti.toFixed(2)}</td>
+                    </tr>
+                    <tr>
+                        <th>Risk Score:</th>
+                        <td>${application.riskScore.toFixed(2)}</td>
+                    </tr>
+                    <tr>
+                        <th>Status:</th>
+                        <td>${application.status}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="alert alert-${application.riskScore >= 0.7 ? 'success' : application.riskScore >= 0.4 ? 'warning' : 'danger'}">
+            <strong>Risk Assessment:</strong> ${application.riskScore >= 0.7 ? 'Low Risk' : application.riskScore >= 0.4 ? 'Medium Risk' : 'High Risk'}
+        </div>
+    `;
+    
+    const modal = new bootstrap.Modal(document.getElementById('reviewModal'));
+    modal.show();
+}
+
+// Quick approve application
+function quickApprove(appId) {
+    updateApplicationStatus(appId, 'Approved');
+}
+
+// Quick reject application
+function quickReject(appId) {
+    updateApplicationStatus(appId, 'Rejected');
+}
+
+// Approve application from review modal
+function approveApplication() {
+    updateApplicationStatus(currentApplicationId, 'Approved');
+    document.getElementById('reviewModal').querySelector('.btn-close').click();
+}
+
+// Reject application from review modal
+function rejectApplication() {
+    updateApplicationStatus(currentApplicationId, 'Rejected');
+    document.getElementById('reviewModal').querySelector('.btn-close').click();
+}
+
+// Update application status
+function updateApplicationStatus(appId, newStatus) {
+    fetch(`/api/applications/${appId}/status`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status: newStatus })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification(`Application ${appId} status updated to ${newStatus}`, 'success');
+            loadApplications(); // Refresh the table
+            loadDashboardStats(); // Refresh stats
+        } else {
+            showNotification(`Error updating application: ${data.error || 'Unknown error'}`, 'danger');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Error updating application status', 'danger');
+    });
+}
+
+// Show notification
+function showNotification(message, type) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+    alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(alertDiv);
+    
+    setTimeout(() => {
+        alertDiv.remove();
+    }, 5000);
+}
+</script>
+
+<style>
+.metric-card {
+    transition: transform 0.3s ease;
+}
+
+.metric-card:hover {
+    transform: translateY(-2px);
+}
+
+.table-responsive {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+/* Compact filter layout */
+.btn-group-sm .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+/* Responsive filter layout */
+@media (max-width: 768px) {
+    .btn-group {
+        flex-wrap: wrap;
+    }
+    
+    .btn-group .btn {
+        margin-bottom: 0.25rem;
+    }
+    
+    #searchInput {
+        width: 100% !important;
+        margin-top: 0.5rem;
+    }
+}
+
+/* Timeline styles for application details */
+.timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -35px;
+    top: 5px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.timeline-content h6 {
+    margin-bottom: 5px;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,349 @@
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --info-color: #17a2b8;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+}
+
+.hero-section {
+    background: linear-gradient(135deg, var(--primary-color), var(--info-color));
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.stat-card {
+    padding: 20px;
+    margin: 10px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+}
+
+.stat-card h3 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.feature-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+}
+
+.metric-card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease;
+}
+
+.metric-card:hover {
+    transform: translateY(-3px);
+}
+
+.process-step {
+    padding: 20px;
+}
+
+.step-number {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0 auto 15px;
+}
+
+.form-container {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    padding: 30px;
+}
+
+.result-card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.btn {
+    border-radius: 25px;
+    padding: 10px 25px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+.card-header {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-bottom: 1px solid #dee2e6;
+    border-radius: 15px 15px 0 0 !important;
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 30px 20px !important;
+    }
+    
+    .stat-card h3 {
+        font-size: 2rem;
+    }
+    
+    .container {
+        padding: 0 15px;
+    }
+}
+
+/* Loading animation */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Success/Error alerts */
+.alert {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+
+/* Additional styles for eligibility checker */
+.credit-range {
+    padding: 10px;
+    border-radius: 8px;
+    margin: 5px;
+    font-size: 0.9rem;
+}
+
+.credit-range.poor {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.credit-range.fair {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.credit-range.good {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+.credit-range.very-good {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.credit-range.excellent {
+    background-color: #d1e7dd;
+    color: #0f5132;
+}
+
+.metric-display {
+    text-align: center;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 10px;
+}
+
+.approval-gauge {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Dashboard specific styles */
+.metric-card {
+    transition: transform 0.3s ease;
+}
+
+.metric-card:hover {
+    transform: translateY(-2px);
+}
+
+.table-responsive {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+/* Loading animation improvements */
+.loading {
+    margin: 20px auto;
+}
+
+/* Form improvements */
+.form-container {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+/* Chart container improvements */
+canvas {
+    max-height: 300px;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .form-container {
+        padding: 20px;
+        margin: 10px;
+    }
+    
+    .metric-display h5 {
+        font-size: 1.1rem;
+    }
+    
+    .credit-range {
+        margin: 2px;
+        padding: 8px;
+        font-size: 0.8rem;
+    }
+}
+
+body {
+  background: linear-gradient(135deg, #f0f4f9 0%, #c9e6ff 100%);
+  min-height: 100vh;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+.login-container {
+  max-width: 370px;
+  margin: 60px auto;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  padding: 32px 28px 24px 28px;
+}
+
+.login-container h2 {
+  text-align: center;
+  margin-bottom: 18px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.login-form label {
+  font-weight: 500;
+  color: #34495e;
+  display: block;
+  margin-bottom: 6px;
+  margin-top: 12px;
+}
+
+.login-form input[type="text"],
+.login-form input[type="password"] {
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  border: 1px solid #cfd8dc;
+  border-radius: 6px;
+  background: #f7fafc;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.login-form input[type="text"]:focus,
+.login-form input[type="password"]:focus {
+  border-color: #007BFF;
+  outline: none;
+  background: #fff;
+}
+
+.login-form .role-options {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 12px;
+  margin-top: 8px;
+}
+
+.login-form .role-options label {
+  font-weight: 400;
+  color: #555;
+  margin-bottom: 0;
+}
+
+.login-form input[type="submit"] {
+  width: 100%;
+  background: #007BFF;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 11px 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-top: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.login-form input[type="submit"]:hover {
+  background: #0056b3;
+}
+
+.toggle-password {
+  float: right;
+  margin-right: 8px;
+  margin-top: -32px;
+  position: relative;
+  z-index: 2;
+  cursor: pointer;
+  color: #007BFF;
+  font-size: 0.95em;
+}
+
+@media (max-width: 600px) {
+  .login-container {
+    padding: 18px 8px 16px 8px;
+    margin: 24px 4px;
+  }
+}

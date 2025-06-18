@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Login - Loan Insights Platform{% endblock %}
+{% block content %}
+<div class="login-container">
+  <h2>Sign In</h2>
+  <form method="POST" class="login-form">
+    <div class="role-options">
+      <label>
+        <input type="radio" name="login_type" value="employee" required>
+        Employee
+      </label>
+      <label>
+        <input type="radio" name="login_type" value="customer" required>
+        Customer
+      </label>
+    </div>
+    <label for="user_id">User ID</label>
+    <input type="text" id="user_id" name="user_id" required autocomplete="username">
+
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" required autocomplete="current-password">
+    <span class="toggle-password" onclick="togglePassword()">Show</span>
+
+    <input type="submit" value="Login">
+  </form>
+</div>
+<script>
+function togglePassword() {
+  const pwd = document.getElementById('password');
+  const toggle = document.querySelector('.toggle-password');
+  if (pwd.type === "password") {
+    pwd.type = "text";
+    toggle.textContent = "Hide";
+  } else {
+    pwd.type = "password";
+    toggle.textContent = "Show";
+  }
+}
+</script>
+{% endblock %}

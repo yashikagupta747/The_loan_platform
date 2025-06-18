@@ -1,0 +1,294 @@
+{% extends "base.html" %}
+
+{% block title %}Eligibility Check - Loan Insights Platform{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="text-center">Loan Eligibility Checker</h1>
+            <p class="text-center text-muted">Check your loan approval probability and get personalized terms</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="form-container">
+                <h4 class="mb-4"><i class="fas fa-user me-2"></i>Your Information</h4>
+                
+                <form id="eligibilityForm">
+                    <div class="mb-3">
+                        <label for="income" class="form-label">Annual Income ($)</label>
+                        <input type="number" class="form-control" id="income" required min="10000" max="1000000" placeholder="50000">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="creditScore" class="form-label">Credit Score</label>
+                        <input type="number" class="form-control" id="creditScore" required min="300" max="850" placeholder="720">
+                        <div class="form-text">Range: 300-850</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="loanAmount" class="form-label">Requested Loan Amount ($)</label>
+                        <input type="number" class="form-control" id="loanAmount" required min="1000" max="500000" placeholder="25000">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="dtiRatio" class="form-label">Debt-to-Income Ratio</label>
+                        <input type="number" class="form-control" id="dtiRatio" required min="0" max="1" step="0.01" placeholder="0.25">
+                        <div class="form-text">Enter as decimal (e.g., 0.25 for 25%)</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="employmentLength" class="form-label">Employment Length (years)</label>
+                        <select class="form-control" id="employmentLength" required>
+                            <option value="">Select employment length</option>
+                            <option value="0">Less than 1 year</option>
+                            <option value="1">1 year</option>
+                            <option value="2">2 years</option>
+                            <option value="3">3 years</option>
+                            <option value="4">4 years</option>
+                            <option value="5">5 years</option>
+                            <option value="6">6+ years</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="loanPurpose" class="form-label">Loan Purpose</label>
+                        <select class="form-control" id="loanPurpose">
+                            <option value="debt_consolidation">Debt Consolidation</option>
+                            <option value="home_improvement">Home Improvement</option>
+                            <option value="major_purchase">Major Purchase</option>
+                            <option value="medical">Medical Expenses</option>
+                            <option value="vacation">Vacation</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-lg w-100">
+                        <i class="fas fa-search me-2"></i>Check Eligibility
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <div id="eligibilityResults" style="display: none;">
+                <div class="result-card">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Eligibility Results</h5>
+                        </div>
+                        <div class="card-body">
+                            <!-- Approval Probability -->
+                            <div class="text-center mb-4">
+                                <div class="approval-gauge">
+                                    <canvas id="approvalGauge" width="200" height="200"></canvas>
+                                </div>
+                                <h3 id="approvalStatus" class="mt-3">Status</h3>
+                            </div>
+                            
+                            <!-- Loan Terms -->
+                            <div class="row">
+                                <div class="col-6 mb-3">
+                                    <div class="metric-display">
+                                        <h5 id="interestRate" class="text-info">0%</h5>
+                                        <p class="mb-0">Interest Rate</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-6 mb-3">
+                                    <div class="metric-display">
+                                        <h5 id="monthlyPayment" class="text-success">$0</h5>
+                                        <p class="mb-0">Monthly Payment</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="alert alert-info">
+                                <h6>Terms & Conditions:</h6>
+                                <p id="termsText" class="mb-0">Terms will be displayed here</p>
+                            </div>
+                            
+                            <!-- Improvement Suggestions -->
+                            <div id="suggestions" class="mt-3">
+                                <h6>Improvement Suggestions:</h6>
+                                <ul id="suggestionsList" class="list-unstyled">
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Credit Score Guide -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h6><i class="fas fa-info-circle me-2"></i>Credit Score Guide</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <div class="credit-range poor">
+                                <strong>300-579</strong>
+                                <br>Poor
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="credit-range fair">
+                                <strong>580-669</strong>
+                                <br>Fair
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="credit-range good">
+                                <strong>670-739</strong>
+                                <br>Good
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row text-center mt-2">
+                        <div class="col-6">
+                            <div class="credit-range very-good">
+                                <strong>740-799</strong>
+                                <br>Very Good
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="credit-range excellent">
+                                <strong>800-850</strong>
+                                <br>Excellent
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('eligibilityForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = {
+        income: document.getElementById('income').value,
+        credit_score: document.getElementById('creditScore').value,
+        loan_amount: document.getElementById('loanAmount').value,
+        dti_ratio: document.getElementById('dtiRatio').value,
+        employment_length: document.getElementById('employmentLength').value
+    };
+    
+    fetch('/predict_eligibility', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert('Error: ' + data.error);
+            return;
+        }
+        
+        // Update results
+        document.getElementById('approvalStatus').textContent = data.status;
+        document.getElementById('interestRate').textContent = data.interest_rate + '%';
+        document.getElementById('monthlyPayment').textContent = '$' + data.monthly_payment.toLocaleString();
+        document.getElementById('termsText').textContent = data.terms;
+        
+        // Create approval gauge
+        createApprovalGauge(data.approval_probability);
+        
+        // Generate suggestions
+        generateSuggestions(formData, data);
+        
+        // Show results
+        document.getElementById('eligibilityResults').style.display = 'block';
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while checking eligibility');
+    });
+});
+
+function createApprovalGauge(probability) {
+    const canvas = document.getElementById('approvalGauge');
+    const ctx = canvas.getContext('2d');
+    
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const radius = 80;
+    
+    // Background circle
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+    ctx.strokeStyle = '#e9ecef';
+    ctx.lineWidth = 10;
+    ctx.stroke();
+    
+    // Progress circle
+    const endAngle = (probability / 100) * 2 * Math.PI - Math.PI / 2;
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, -Math.PI / 2, endAngle);
+    
+    if (probability >= 70) {
+        ctx.strokeStyle = '#28a745';
+    } else if (probability >= 50) {
+        ctx.strokeStyle = '#ffc107';
+    } else {
+        ctx.strokeStyle = '#dc3545';
+    }
+    
+    ctx.lineWidth = 10;
+    ctx.stroke();
+    
+    // Text
+    ctx.fillStyle = '#333';
+    ctx.font = 'bold 24px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(probability + '%', centerX, centerY + 8);
+}
+
+function generateSuggestions(formData, results) {
+    const suggestions = [];
+    const creditScore = parseFloat(formData.credit_score);
+    const dtiRatio = parseFloat(formData.dti_ratio);
+    const income = parseFloat(formData.income);
+    const loanAmount = parseFloat(formData.loan_amount);
+    
+    if (creditScore < 700) {
+        suggestions.push('Improve your credit score by paying bills on time and reducing credit utilization');
+    }
+    
+    if (dtiRatio > 0.3) {
+        suggestions.push('Reduce your debt-to-income ratio by paying down existing debts');
+    }
+    
+    if (loanAmount > income * 0.5) {
+        suggestions.push('Consider requesting a smaller loan amount relative to your income');
+    }
+    
+    if (results.approval_probability < 50) {
+        suggestions.push('Consider applying with a co-signer to improve approval chances');
+    }
+    
+    const suggestionsList = document.getElementById('suggestionsList');
+    suggestionsList.innerHTML = '';
+    
+    suggestions.forEach(suggestion => {
+        const li = document.createElement('li');
+        li.innerHTML = '<i class="fas fa-arrow-right text-primary me-2"></i>' + suggestion;
+        li.className = 'mb-2';
+        suggestionsList.appendChild(li);
+    });
+}
+</script>
+{% endblock %}

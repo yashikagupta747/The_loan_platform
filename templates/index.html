@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Loan Insights Platform{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Hero Section -->
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <div class="hero-section bg-gradient-primary text-white p-5 rounded">
+                <h1 class="display-4 mb-3">Loan Insights Platform</h1>
+                <p class="lead mb-4">AI-Powered Loan Analysis and Prediction System</p>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="stat-card">
+                            <h3>89%</h3>
+                            <p>Model Accuracy</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stat-card">
+                            <h3>50K+</h3>
+                            <p>Loans Analyzed</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stat-card">
+                            <h3>78%</h3>
+                            <p>Approval Rate</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="text-center mb-4">Platform Features</h2>
+        </div>
+        
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card feature-card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-chart-bar fa-3x text-primary mb-3"></i>
+                    <h5 class="card-title">Data Insights</h5>
+                    <p class="card-text">Comprehensive analysis of loan patterns and risk factors</p>
+                    <a href="{{ url_for('insights') }}" class="btn btn-primary">View Insights</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card feature-card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-calculator fa-3x text-success mb-3"></i>
+                    <h5 class="card-title">Loan Calculator</h5>
+                    <p class="card-text">Calculate monthly payments and total loan costs</p>
+                    <a href="{{ url_for('calculator') }}" class="btn btn-success">Calculate</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card feature-card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-check-circle fa-3x text-info mb-3"></i>
+                    <h5 class="card-title">Eligibility Check</h5>
+                    <p class="card-text">Check loan approval probability and terms</p>
+                    <a href="{{ url_for('eligibility') }}" class="btn btn-info">Check Eligibility</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card feature-card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-tachometer-alt fa-3x text-warning mb-3"></i>
+                    <h5 class="card-title">Dashboard</h5>
+                    <p class="card-text">Employee dashboard for loan decision support</p>
+                    <a href="{{ url_for('login') }}" class="btn btn-warning">Open Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- How It Works Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="text-center mb-4">How It Works</h2>
+        </div>
+        
+        <div class="col-md-4 text-center mb-4">
+            <div class="process-step">
+                <div class="step-number">1</div>
+                <h5>Data Input</h5>
+                <p>Enter loan application details and borrower information</p>
+            </div>
+        </div>
+        
+        <div class="col-md-4 text-center mb-4">
+            <div class="process-step">
+                <div class="step-number">2</div>
+                <h5>AI Analysis</h5>
+                <p>Our machine learning model analyzes risk factors and patterns</p>
+            </div>
+        </div>
+        
+        <div class="col-md-4 text-center mb-4">
+            <div class="process-step">
+                <div class="step-number">3</div>
+                <h5>Results</h5>
+                <p>Get instant predictions, recommendations, and insights</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
