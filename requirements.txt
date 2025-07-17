@@ -1,6 +1,9 @@
-Flask
+flask
 pandas
 numpy
 scikit-learn
-pickle-mixin
-Werkzeug
+joblib
+gunicorn
+flask-login
+flask-bcrypt
+python-dotenv

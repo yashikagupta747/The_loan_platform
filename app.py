@@ -36,8 +36,178 @@ def employee_required(f):
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 
+
+# Add this route to your app.py file
+
+@app.route('/apply')
+def apply():
+    """Render the loan application form"""
+    return render_template('apply.html')
+
+# Update the existing create_application route to handle additional fields
+@app.route('/api/applications', methods=['POST'])
+def create_application():
+    """Create new application with enhanced validation and additional fields"""
+    try:
+        global applications_data
+        data = request.json
+        
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+        
+        # Validate required fields
+        required_fields = ['applicant', 'income', 'creditScore', 'amount', 'dti']
+        for field in required_fields:
+            if field not in data or not str(data[field]).strip():
+                return jsonify({'error': f'Missing required field: {field}'}), 400
+        
+        # Convert and validate numeric fields
+        try:
+            income = int(data['income'])
+            credit_score = int(data['creditScore'])
+            amount = int(data['amount'])
+            dti = float(data['dti'])
+            
+            if income <= 0 or amount <= 0:
+                return jsonify({'error': 'Income and amount must be positive'}), 400
+            if not (300 <= credit_score <= 850):
+                return jsonify({'error': 'Credit score must be between 300 and 850'}), 400
+            if not (0 <= dti <= 1):
+                return jsonify({'error': 'DTI ratio must be between 0 and 1'}), 400
+        except ValueError as e:
+            return jsonify({'error': f'Invalid numeric value: {str(e)}'}), 400
+        
+        # Generate ID with current year
+        current_year = datetime.now().year
+        next_id = len(applications_data) + 1
+        app_id = f"LN{current_year}{str(next_id).zfill(4)}"
+        
+        # Create new application with all fields
+        new_app = {
+            'id': app_id,
+            'applicant': data['applicant'].strip(),
+            'email': data.get('email', ''),
+            'phone': data.get('phone', ''),
+            'ssn': data.get('ssn', ''),
+            'amount': amount,
+            'status': 'Pending',
+            'riskScore': calculate_risk_score(data),
+            'date': datetime.now().strftime('%Y-%m-%d'),
+            'creditScore': credit_score,
+            'income': income,
+            'monthlyDebt': data.get('monthlyDebt', 0),
+            'employmentStatus': data.get('employmentStatus', ''),
+            'purpose': data.get('purpose', ''),
+            'term': data.get('term', 36),
+            'homeOwnership': data.get('homeOwnership', ''),
+            'dti': dti,
+            'created_date': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'updated_date': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+        
+        applications_data.append(new_app)
+        
+        # Save to file
+        if save_applications_to_file(applications_data):
+            return jsonify({'success': True, 'application': new_app})
+        else:
+            return jsonify({'error': 'Failed to save application'}), 500
+        
+    except Exception as e:
+        print(f"Error creating application: {e}")
+        app.logger.error(f"Error creating application: {e}")
+        return jsonify({'error': 'Failed to create application'}), 500
+
+# Enhanced calculate_risk_score function to handle additional fields
+def calculate_risk_score(data):
+    """Calculate risk score for new application with enhanced factors"""
+    try:
+        score = 0
+        
+        # Credit score impact (35%)
+        credit_score = int(data.get('creditScore', 600))
+        if credit_score >= 800:
+            score += 0.35
+        elif credit_score >= 750:
+            score += 0.30
+        elif credit_score >= 700:
+            score += 0.25
+        elif credit_score >= 650:
+            score += 0.20
+        elif credit_score >= 600:
+            score += 0.15
+        else:
+            score += 0.05
+        
+        # DTI ratio impact (25%)
+        dti = float(data.get('dti', 0.5))
+        if dti <= 0.2:
+            score += 0.25
+        elif dti <= 0.3:
+            score += 0.20
+        elif dti <= 0.4:
+            score += 0.15
+        elif dti <= 0.5:
+            score += 0.10
+        else:
+            score += 0.0
+        
+        # Income impact (20%)
+        income = int(data.get('income', 30000))
+        if income >= 100000:
+            score += 0.20
+        elif income >= 75000:
+            score += 0.17
+        elif income >= 50000:
+            score += 0.15
+        elif income >= 30000:
+            score += 0.10
+        else:
+            score += 0.05
+        
+        # Loan-to-income ratio (10%)
+        amount = int(data.get('amount', 10000))
+        loan_to_income = amount / income if income > 0 else 1
+        if loan_to_income <= 0.3:
+            score += 0.10
+        elif loan_to_income <= 0.5:
+            score += 0.07
+        elif loan_to_income <= 0.7:
+            score += 0.05
+        else:
+            score += 0.0
+        
+        # Employment status impact (5%)
+        employment = data.get('employmentStatus', '').lower()
+        if employment == 'employed':
+            score += 0.05
+        elif employment == 'self-employed':
+            score += 0.03
+        elif employment == 'retired':
+            score += 0.02
+        else:
+            score += 0.0
+        
+        # Home ownership impact (5%)
+        home_ownership = data.get('homeOwnership', '').lower()
+        if home_ownership == 'own':
+            score += 0.05
+        elif home_ownership == 'mortgage':
+            score += 0.03
+        elif home_ownership == 'rent':
+            score += 0.02
+        else:
+            score += 0.0
+        
+        return min(score, 0.99)  # Cap at 99%
+    except Exception as e:
+        print(f"Error calculating risk score: {e}")
+        return 0.5  # Default risk score
+
+# Update the DATA_FILE path to use applications.json instead of data/applications.json
+
 # File to store application data
-DATA_FILE = 'data/applications.json'
+DATA_FILE = 'applications.json'
 
 def load_applications_from_file():
     """Load applications from JSON file with improved error handling"""
@@ -61,7 +231,11 @@ def load_applications_from_file():
 def save_applications_to_file(applications):
     """Save applications to JSON file with improved error handling"""
     try:
-        os.makedirs(os.path.dirname(DATA_FILE), exist_ok=True)
+        # Only create directories if DATA_FILE contains a directory path
+        dir_path = os.path.dirname(DATA_FILE)
+        if dir_path:  # Only create directories if path is not empty
+            os.makedirs(dir_path, exist_ok=True)
+        
         with open(DATA_FILE, 'w') as f:
             json.dump(applications, f, indent=2)
         print(f"Saved {len(applications)} applications to file")
@@ -273,66 +447,6 @@ def get_applications():
         app.logger.error(f"Error in get_applications: {e}")
         return jsonify({'error': 'Failed to load applications'}), 500
 
-@app.route('/api/applications', methods=['POST'])
-def create_application():
-    """Create new application with enhanced validation"""
-    try:
-        global applications_data
-        data = request.json
-        
-        if not data:
-            return jsonify({'error': 'No data provided'}), 400
-        
-        # Validate required fields
-        required_fields = ['applicant', 'income', 'creditScore', 'amount', 'dti']
-        for field in required_fields:
-            if field not in data or not str(data[field]).strip():
-                return jsonify({'error': f'Missing required field: {field}'}), 400
-        
-        # Convert and validate numeric fields
-        try:
-            income = int(data['income'])
-            credit_score = int(data['creditScore'])
-            amount = int(data['amount'])
-            dti = float(data['dti'])
-            
-            if income <= 0 or amount <= 0:
-                return jsonify({'error': 'Income and amount must be positive'}), 400
-            if not (300 <= credit_score <= 850):
-                return jsonify({'error': 'Credit score must be between 300 and 850'}), 400
-            if not (0 <= dti <= 1):
-                return jsonify({'error': 'DTI ratio must be between 0 and 1'}), 400
-        except ValueError as e:
-            return jsonify({'error': f'Invalid numeric value: {str(e)}'}), 400
-        
-        # Generate ID with current year
-        current_year = datetime.now().year
-        next_id = len(applications_data) + 1
-        app_id = f"LN{current_year}{str(next_id).zfill(4)}"
-        
-        new_app = {
-            'id': app_id,
-            'applicant': data['applicant'].strip(),
-            'amount': amount,
-            'status': 'Pending',
-            'riskScore': calculate_risk_score(data),
-            'date': datetime.now().strftime('%Y-%m-%d'),
-            'creditScore': credit_score,
-            'income': income,
-            'dti': dti,
-            'created_date': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-            'updated_date': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        }
-        
-        applications_data.append(new_app)
-        save_applications_to_file(applications_data)
-        
-        return jsonify({'success': True, 'application': new_app})
-        
-    except Exception as e:
-        print(f"Error creating application: {e}")
-        app.logger.error(f"Error creating application: {e}")
-        return jsonify({'error': 'Failed to create application'}), 500
 
 @app.route('/api/applications/<app_id>/status', methods=['PUT'])
 def update_application_status(app_id):
@@ -410,60 +524,6 @@ def get_dashboard_stats():
             'total_disbursed': 0
         })
 
-def calculate_risk_score(data):
-    """Calculate risk score for new application"""
-    try:
-        score = 0
-        
-        # Credit score impact (40%)
-        credit_score = int(data.get('creditScore', 600))
-        if credit_score >= 750:
-            score += 0.4
-        elif credit_score >= 700:
-            score += 0.35
-        elif credit_score >= 650:
-            score += 0.25
-        elif credit_score >= 600:
-            score += 0.15
-        else:
-            score += 0.05
-        
-        # DTI ratio impact (25%)
-        dti = float(data.get('dti', 0.5))
-        if dti <= 0.2:
-            score += 0.25
-        elif dti <= 0.3:
-            score += 0.20
-        elif dti <= 0.4:
-            score += 0.10
-        else:
-            score += 0.0
-        
-        # Income impact (20%)
-        income = int(data.get('income', 30000))
-        if income >= 75000:
-            score += 0.20
-        elif income >= 50000:
-            score += 0.15
-        elif income >= 30000:
-            score += 0.10
-        else:
-            score += 0.05
-        
-        # Loan-to-income ratio (15%)
-        amount = int(data.get('amount', 10000))
-        loan_to_income = amount / income if income > 0 else 1
-        if loan_to_income <= 0.3:
-            score += 0.15
-        elif loan_to_income <= 0.5:
-            score += 0.10
-        else:
-            score += 0.0
-        
-        return min(score, 0.99)
-    except Exception as e:
-        print(f"Error calculating risk score: {e}")
-        return 0.5  # Default risk score
 
 @app.route('/predict_eligibility', methods=['POST'])
 def predict_eligibility():

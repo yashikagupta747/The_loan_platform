@@ -1,0 +1,436 @@
+{% extends "base.html" %}
+
+{% block title %}Apply for Loan - Loan Insights Platform{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="form-container">
+                <h2 class="text-center mb-4">
+                    <i class="fas fa-file-alt"></i> Apply for a Loan
+                </h2>
+                <p class="text-center text-muted mb-4">
+                    Fill out the form below to apply for a loan. Our AI system will analyze your application and provide instant feedback.
+                </p>
+
+                <!-- Application Form -->
+                <form id="loanApplicationForm" class="needs-validation" novalidate>
+                    <div class="row">
+                        <!-- Personal Information -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="applicantName" class="form-label">Full Name *</label>
+                                <input type="text" class="form-control" id="applicantName" name="applicantName" 
+                                       required maxlength="100" placeholder="Enter your full name">
+                                <div class="invalid-feedback">
+                                    Please provide your full name.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email Address *</label>
+                                <input type="email" class="form-control" id="email" name="email" 
+                                       required placeholder="Enter your email">
+                                <div class="invalid-feedback">
+                                    Please provide a valid email address.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="phone" class="form-label">Phone Number *</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" 
+                                       required placeholder="(123) 456-7890">
+                                <div class="invalid-feedback">
+                                    Please provide your phone number.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="ssn" class="form-label">Social Security Number *</label>
+                                <input type="text" class="form-control" id="ssn" name="ssn" 
+                                       required placeholder="XXX-XX-XXXX" maxlength="11">
+                                <div class="invalid-feedback">
+                                    Please provide your SSN.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Financial Information -->
+                        <div class="col-12">
+                            <h5 class="mt-4 mb-3">Financial Information</h5>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="annualIncome" class="form-label">Annual Income *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" class="form-control" id="annualIncome" name="annualIncome" 
+                                           required min="1000" max="10000000" placeholder="50000">
+                                </div>
+                                <div class="invalid-feedback">
+                                    Please provide your annual income (minimum $1,000).
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="creditScore" class="form-label">Credit Score *</label>
+                                <input type="number" class="form-control" id="creditScore" name="creditScore" 
+                                       required min="300" max="850" placeholder="720">
+                                <div class="invalid-feedback">
+                                    Please provide your credit score (300-850).
+                                </div>
+                                <div class="form-text">
+                                    <div class="credit-range poor">300-579: Poor</div>
+                                    <div class="credit-range fair">580-669: Fair</div>
+                                    <div class="credit-range good">670-739: Good</div>
+                                    <div class="credit-range very-good">740-799: Very Good</div>
+                                    <div class="credit-range excellent">800-850: Excellent</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="monthlyDebt" class="form-label">Monthly Debt Payments *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" class="form-control" id="monthlyDebt" name="monthlyDebt" 
+                                           required min="0" max="50000" placeholder="1500">
+                                </div>
+                                <div class="invalid-feedback">
+                                    Please provide your monthly debt payments.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="employmentStatus" class="form-label">Employment Status *</label>
+                                <select class="form-select" id="employmentStatus" name="employmentStatus" required>
+                                    <option value="">Select employment status</option>
+                                    <option value="employed">Employed</option>
+                                    <option value="self-employed">Self-Employed</option>
+                                    <option value="unemployed">Unemployed</option>
+                                    <option value="retired">Retired</option>
+                                    <option value="student">Student</option>
+                                </select>
+                                <div class="invalid-feedback">
+                                    Please select your employment status.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Loan Details -->
+                        <div class="col-12">
+                            <h5 class="mt-4 mb-3">Loan Details</h5>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="loanAmount" class="form-label">Requested Loan Amount *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" class="form-control" id="loanAmount" name="loanAmount" 
+                                           required min="500" max="1000000" placeholder="25000">
+                                </div>
+                                <div class="invalid-feedback">
+                                    Please provide the loan amount ($500 - $1,000,000).
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="loanPurpose" class="form-label">Loan Purpose *</label>
+                                <select class="form-select" id="loanPurpose" name="loanPurpose" required>
+                                    <option value="">Select loan purpose</option>
+                                    <option value="home_improvement">Home Improvement</option>
+                                    <option value="debt_consolidation">Debt Consolidation</option>
+                                    <option value="car">Car Purchase</option>
+                                    <option value="medical">Medical Expenses</option>
+                                    <option value="education">Education</option>
+                                    <option value="business">Business</option>
+                                    <option value="other">Other</option>
+                                </select>
+                                <div class="invalid-feedback">
+                                    Please select the loan purpose.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="loanTerm" class="form-label">Preferred Loan Term *</label>
+                                <select class="form-select" id="loanTerm" name="loanTerm" required>
+                                    <option value="">Select loan term</option>
+                                    <option value="12">12 months</option>
+                                    <option value="24">24 months</option>
+                                    <option value="36">36 months</option>
+                                    <option value="48">48 months</option>
+                                    <option value="60">60 months</option>
+                                </select>
+                                <div class="invalid-feedback">
+                                    Please select the loan term.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="homeOwnership" class="form-label">Home Ownership *</label>
+                                <select class="form-select" id="homeOwnership" name="homeOwnership" required>
+                                    <option value="">Select home ownership</option>
+                                    <option value="own">Own</option>
+                                    <option value="rent">Rent</option>
+                                    <option value="mortgage">Mortgage</option>
+                                    <option value="other">Other</option>
+                                </select>
+                                <div class="invalid-feedback">
+                                    Please select your home ownership status.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="col-12 text-center mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-paper-plane"></i> Submit Application
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Application Result Modal -->
+<div class="modal fade" id="applicationResultModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Application Submitted</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="applicationResult"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="window.location.href='{{ url_for('index') }}'">
+                    Go to Home
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('loanApplicationForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const form = e.target;
+    const formData = new FormData(form);
+    const data = {};
+    
+    // Convert form data to object
+    for (let [key, value] of formData.entries()) {
+        data[key] = value;
+    }
+    
+    // Calculate DTI ratio
+    const monthlyIncome = parseFloat(data.annualIncome) / 12;
+    const monthlyDebt = parseFloat(data.monthlyDebt);
+    data.dti = monthlyDebt / monthlyIncome;
+    
+    // Prepare data for API
+    const applicationData = {
+        applicant: data.applicantName,
+        email: data.email,
+        phone: data.phone,
+        ssn: data.ssn,
+        income: parseInt(data.annualIncome),
+        creditScore: parseInt(data.creditScore),
+        monthlyDebt: parseFloat(data.monthlyDebt),
+        employmentStatus: data.employmentStatus,
+        amount: parseInt(data.loanAmount),
+        purpose: data.loanPurpose,
+        term: parseInt(data.loanTerm),
+        homeOwnership: data.homeOwnership,
+        dti: data.dti
+    };
+    
+    try {
+        // Show loading
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+        submitBtn.disabled = true;
+        
+        // Submit application
+        const response = await fetch('/api/applications', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(applicationData)
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok && result.success) {
+            // Show success message
+            const resultDiv = document.getElementById('applicationResult');
+            const riskScore = (result.application.riskScore * 100).toFixed(1);
+            const riskLevel = getRiskLevel(result.application.riskScore);
+            
+            resultDiv.innerHTML = `
+                <div class="alert alert-success">
+                    <h5><i class="fas fa-check-circle"></i> Application Submitted Successfully!</h5>
+                    <p>Your loan application has been received and is being processed.</p>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Application Details:</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>Application ID:</strong> ${result.application.id}</li>
+                            <li><strong>Applicant:</strong> ${result.application.applicant}</li>
+                            <li><strong>Amount:</strong> $${result.application.amount.toLocaleString()}</li>
+                            <li><strong>Status:</strong> <span class="badge bg-warning">${result.application.status}</span></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Risk Assessment:</h6>
+                        <div class="metric-display">
+                            <h5>Risk Score: ${riskScore}%</h5>
+                            <div class="badge bg-${getRiskBadgeColor(result.application.riskScore)}">${riskLevel}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="alert alert-info mt-3">
+                    <i class="fas fa-info-circle"></i> 
+                    You will be notified via email about the status of your application. 
+                    Please keep your Application ID for future reference.
+                </div>
+            `;
+            
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('applicationResultModal'));
+            modal.show();
+            
+            // Reset form
+            form.reset();
+            form.classList.remove('was-validated');
+            
+        } else {
+            // Show error message
+            const resultDiv = document.getElementById('applicationResult');
+            resultDiv.innerHTML = `
+                <div class="alert alert-danger">
+                    <h5><i class="fas fa-exclamation-triangle"></i> Application Failed</h5>
+                    <p>${result.error || 'An error occurred while processing your application.'}</p>
+                </div>
+            `;
+            
+            const modal = new bootstrap.Modal(document.getElementById('applicationResultModal'));
+            modal.show();
+        }
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred while submitting your application. Please try again.');
+    } finally {
+        // Restore button
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    }
+});
+
+// Helper functions
+function getRiskLevel(score) {
+    if (score >= 0.8) return 'Low Risk';
+    if (score >= 0.6) return 'Medium Risk';
+    if (score >= 0.4) return 'High Risk';
+    return 'Very High Risk';
+}
+
+function getRiskBadgeColor(score) {
+    if (score >= 0.8) return 'success';
+    if (score >= 0.6) return 'warning';
+    if (score >= 0.4) return 'danger';
+    return 'dark';
+}
+
+// Format SSN input
+document.getElementById('ssn').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length >= 3) {
+        value = value.substring(0, 3) + '-' + value.substring(3);
+    }
+    if (value.length >= 6) {
+        value = value.substring(0, 6) + '-' + value.substring(6, 10);
+    }
+    e.target.value = value;
+});
+
+// Format phone input
+document.getElementById('phone').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length >= 3) {
+        value = '(' + value.substring(0, 3) + ') ' + value.substring(3);
+    }
+    if (value.length >= 9) {
+        value = value.substring(0, 9) + '-' + value.substring(9, 13);
+    }
+    e.target.value = value;
+});
+
+// Auto-calculate DTI
+document.getElementById('annualIncome').addEventListener('input', calculateDTI);
+document.getElementById('monthlyDebt').addEventListener('input', calculateDTI);
+
+function calculateDTI() {
+    const annualIncome = parseFloat(document.getElementById('annualIncome').value) || 0;
+    const monthlyDebt = parseFloat(document.getElementById('monthlyDebt').value) || 0;
+    
+    if (annualIncome > 0) {
+        const monthlyIncome = annualIncome / 12;
+        const dti = monthlyDebt / monthlyIncome;
+        
+        // Show DTI ratio as guidance
+        const existingDTI = document.getElementById('dti-display');
+        if (existingDTI) {
+            existingDTI.remove();
+        }
+        
+        if (dti > 0) {
+            const dtiDisplay = document.createElement('div');
+            dtiDisplay.id = 'dti-display';
+            dtiDisplay.className = 'form-text';
+            dtiDisplay.innerHTML = `
+                <small class="text-muted">
+                    Current DTI Ratio: ${(dti * 100).toFixed(1)}%
+                    ${dti > 0.43 ? '<span class="text-danger">(High DTI may affect approval)</span>' : 
+                      dti > 0.36 ? '<span class="text-warning">(Moderate DTI)</span>' : 
+                      '<span class="text-success">(Good DTI)</span>'}
+                </small>
+            `;
+            document.getElementById('monthlyDebt').parentNode.appendChild(dtiDisplay);
+        }
+    }
+}
+</script>
+{% endblock %}
